@@ -9,7 +9,6 @@ from contextlib import closing
 import eccodes
 import numpy as np
 import xarray
-from metpy.calc import vorticity, wind_speed
 from metpy.constants import earth_avg_radius as EARTH_RADIUS
 from metpy.units import units
 from siphon.catalog import TDSCatalog
@@ -158,16 +157,6 @@ class NwpModel:
                         grib_data = ftp_data.read()
                     dataset[var_name] = xarray_from_grib_data(grib_data)
             dataset_cf = dataset.metpy.parse_cf()
-        if "wind_speed" in variables:
-            dataset_cf["wind_speed"] = wind_speed(
-                dataset_cf[get_variable_name("x_wind")[0]].metpy.quantify(),
-                dataset_cf[get_variable_name("y_wind")[0]].metpy.quantify(),
-            )
-        if "vorticity" in variables:
-            dataset_cf["vorticity"] = vorticity(
-                dataset_cf[get_variable_name("x_wind")[0]].metpy.quantify(),
-                dataset_cf[get_variable_name("y_wind")[0]].metpy.quantify(),
-            )
         return dataset_cf
 
 
