@@ -25,7 +25,7 @@ import xarray
 
 try:
     FILE_DIR = os.path.abspath(os.path.dirname(__file__))
-except Exception:
+except NameError:
     FILE_DIR = os.path.abspath(".")
 REPO_ROOT = os.path.abspath(FILE_DIR)
 

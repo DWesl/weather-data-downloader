@@ -1,3 +1,11 @@
+# ~*~ coding: utf8 ~*~
+"""Collect the data and algorithms needed to get model data.
+
+One general-ish class (general for models available through TDS, less
+so for those only available through FTP, I think, plus a few instances
+for different models.
+
+"""
 import collections
 import dataclasses
 import datetime
@@ -189,7 +197,9 @@ class NwpModel:
                 ].follow()
                 tds_ds = this_catalog.datasets[0]
             except KeyError:
-                raise KeyError("Data for specified initial time not available")
+                raise KeyError(
+                    "Data for specified initial time not available"
+                ) from None
             ncss = tds_ds.subset()
             query = ncss.query()
             query.lonlat_box(
@@ -277,11 +287,11 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
                 grib_attributes[key_name] = eccodes.codes_get_array(msg_id, key_name)
     finally:
         eccodes.codes_release(msg_id)
-    Nj = grib_attributes.pop("Nj")
-    Ni = grib_attributes.pop("Ni")
-    field_values = grib_attributes.pop("values").reshape(Nj, Ni)
-    latitudes = grib_attributes.pop("latitudes").reshape(Nj, Ni)
-    longitudes = grib_attributes.pop("longitudes").reshape(Nj, Ni)
+    num_rows = grib_attributes.pop("Nj")
+    num_cols = grib_attributes.pop("Ni")
+    field_values = grib_attributes.pop("values").reshape(num_rows, num_cols)
+    latitudes = grib_attributes.pop("latitudes").reshape(num_rows, num_cols)
+    longitudes = grib_attributes.pop("longitudes").reshape(num_rows, num_cols)
     # latitude = grib_attributes.pop("distinctLatitudes")
     # longitude = grib_attributes.pop("distinctLongtitudes")
     del grib_attributes["latLonValues"]
@@ -311,7 +321,7 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
             attrs={"level_type": level_type},
         )
     standard_name = grib_attributes.pop("cfName")
-    units = grib_attributes.pop("units")
+    grib_units = grib_attributes.pop("units")
     field_min = grib_attributes.pop("minimum")
     field_max = grib_attributes.pop("maximum")
     missing_value = grib_attributes.pop("missingValue")
@@ -374,7 +384,7 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
             standard_name,
             {
                 "standard_name": standard_name,
-                "units": units,
+                "units": grib_units,
                 "actual_range": (field_min, field_max),
             },
             {"_FillValue": missing_value, "grid_mapping_name": "latlon_crs"},

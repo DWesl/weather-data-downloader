@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# ~*~ coding: utf8 ~*~
+"""Script to download and save data for given model and time.
+
+Each level currently saved in a different file to avoid a half-empty
+ECMWF file.
+
+"""
 import argparse
 import datetime
 import os.path
@@ -31,7 +39,7 @@ def main_argv(argv: typing.List[str]) -> int:
     -------
     int
     """
-    args = PARSER.parse_args(sys.argv[1:])
+    args = PARSER.parse_args(argv)
     model = NWP_MODELS[args.model_abbrev]
     if args.init_time is None:
         last_start = model.get_last_model_start()
