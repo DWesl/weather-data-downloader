@@ -3,7 +3,7 @@ import dataclasses
 import datetime
 import getpass
 import typing
-import urllib
+import urllib.request
 from contextlib import closing
 
 import eccodes
@@ -27,6 +27,13 @@ METPY_DEPENDENT_VARIABLES = {
 
 @dataclasses.dataclass
 class NwpModel:
+    """Encapsulate the data needed to get data from an NWP model.
+
+    Some of this is more useful for generating graphics, but I may
+    dump it into metadata.  :pypi:`cc-plugin-ncei` would install a
+    good checker.
+    """
+
     abbrev: str
     short_desc: str
     cycling_interval: int
@@ -204,10 +211,12 @@ class NwpModel:
 
             query.vertical_level(level)
             data = ncss.get_data(query)
-            dataset = xarray.open_dataset(xarray.backends.NetCDF4DataStore(data))
+            dataset: xarray.Dataset = xarray.open_dataset(  # type: ignore
+                xarray.backends.NetCDF4DataStore(data)  # type: ignore
+            )
             # The dataset isn't fully CF, since Unidata doesn't set standard
             # names, but this at least gets me the projection.
-            dataset_cf = dataset.metpy.parse_cf()
+            dataset_cf: xarray.Dataset = dataset.metpy.parse_cf()
         elif self.data_access_protocall == "ftp":
             dataset = xarray.Dataset()
             lead_time = valid_time - init_time
@@ -242,7 +251,7 @@ class NwpModel:
         return dataset_cf
 
 
-def xarray_from_grib_data(grib_data: bytes) -> xarray.Dataset:
+def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
     """Produce an XArray dataset from binary grib data
 
     Parameters
@@ -251,7 +260,7 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.Dataset:
 
     Returns
     -------
-    xarray.Dataset
+    xarray.DataArray
     """
     msg_id = eccodes.codes_new_from_message(grib_data)
     try:
@@ -308,7 +317,7 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.Dataset:
     missing_value = grib_attributes.pop("missingValue")
     # earth_radius = grib_attributes.pop("earthRadius")
 
-    result = (
+    result: xarray.DataArray = (
         xarray.DataArray(
             field_values,
             {
@@ -382,7 +391,7 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.Dataset:
         {
             f"GRIB_{name:s}": value
             for name, value in grib_attributes.items()
-            if not isinstance(value, type(None))
+            if value is not None
         }
     )
     return result

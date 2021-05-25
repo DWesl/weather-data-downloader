@@ -33,7 +33,7 @@ def main_argv(argv: typing.List[str]) -> int:
     """
     args = PARSER.parse_args(sys.argv[1:])
     model = NWP_MODELS[args.model_abbrev]
-    if args.init_time == None:
+    if args.init_time is None:
         last_start = model.get_last_model_start()
         if not model.model_start_has_data(last_start):
             last_start = model.get_previous_model_start(last_start)
@@ -62,8 +62,10 @@ def main_argv(argv: typing.List[str]) -> int:
                 dataset,
                 os.path.join(
                     save_dir,
-                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
-                    "f{args.forecast_hour:02d}_{pressure_mb:04d}mb_data.nc4",
+                    (
+                        f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                        f"f{args.forecast_hour:02d}_{pressure_mb:04d}mb_data.nc4"
+                    ),
                 ),
             )
     else:
@@ -80,8 +82,10 @@ def main_argv(argv: typing.List[str]) -> int:
                 dataset,
                 os.path.join(
                     save_dir,
-                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
-                    f"f{args.forecast_hour:02d}_{pressure_mb:04d}mb_data.nc4",
+                    (
+                        f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                        f"f{args.forecast_hour:02d}_{pressure_mb:04d}mb_data.nc4"
+                    ),
                 ),
             )
     return 0

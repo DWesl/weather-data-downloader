@@ -12,9 +12,9 @@ download the variables I used to make plots in my server.
 
 """
 try:
-    from importlib.metadata import version
+    from importlib.metadata import version  # type: ignore
 except ImportError:
-    from importlib_metadata import version
+    from importlib_metadata import version  # type: ignore
 
 from .nwp_models import NWP_MODELS
 
