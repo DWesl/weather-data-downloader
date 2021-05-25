@@ -35,6 +35,6 @@ jobs:
     - name: Test the command
       run: |
         download-nwp-model-data GFS 06
-        file GFS/*/*
+        file GFS/*/*/*
         python -m download_nwp_model_output NAM 06
         file NAM/*/*/*
