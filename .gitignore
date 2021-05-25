@@ -1,9 +1,12 @@
 *~
 
-# Python generated filed
+# Python generated files
 __pycache__
 /build/
 /dist/
+*.egg-info
+*.dist-info
+*.pyz
 
 # Script-generated files
 ECMWF
