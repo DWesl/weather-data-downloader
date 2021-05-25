@@ -21,6 +21,16 @@ PARSER.add_argument("--init-time", type=dateutil.parser.parse, default=None)
 
 
 def main_argv(argv: typing.List[str]) -> int:
+    """Call script using given arguments.
+
+    Parameters
+    ----------
+    argv: list of str
+
+    Returns
+    -------
+    int
+    """
     args = PARSER.parse_args(sys.argv[1:])
     model = NWP_MODELS[args.model_abbrev]
     if args.init_time == None:
@@ -74,9 +84,16 @@ def main_argv(argv: typing.List[str]) -> int:
                     f"f{args.forecast_hour:02d}_{pressure_mb:04d}mb_data.nc4",
                 ),
             )
+    return 0
 
 
 def main() -> int:
+    """Call script using command-line arguments.
+
+    Returns
+    -------
+    int
+    """
     return main_argv(sys.argv[1:])
 
 

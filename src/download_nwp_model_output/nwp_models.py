@@ -42,12 +42,38 @@ class NwpModel:
     ftp_data_path_pattern: str = ""
 
     def convert_pressure_to_reported_units(self, pressure: int) -> int:
+        """Convert pressure from hPa to model-reported units.
+
+        Parameters
+        ----------
+        pressure: int
+
+        Returns
+        -------
+        int
+        """
         return int(units(f"{pressure:d} hPa").to(self.pressure_level_units).magnitude)
 
     def is_model_start(self, init_time: datetime.datetime) -> bool:
+        """Is there a model run starting at the given time?
+
+        Parameters
+        ----------
+        init_time: datetime.datetime
+
+        Returns
+        -------
+        bool
+        """
         return (init_time.hour - self.cycling_offset) % self.cycling_interval == 0
 
     def get_last_model_start(self) -> datetime.datetime:
+        """Get the start of the most recent model run.
+
+        Returns
+        -------
+        datetime.datetime
+        """
         last_hour = datetime.datetime.utcnow().replace(
             minute=0, second=0, microsecond=0
         )
@@ -59,30 +85,86 @@ class NwpModel:
     def get_previous_model_start(
         self, init_time: datetime.datetime
     ) -> datetime.datetime:
+        """Get the model start time before the given one.
+
+        Parameters
+        ----------
+        init_time: datetime.datetime
+
+        Returns
+        -------
+        datetime.datetime
+        """
         return init_time - datetime.timedelta(hours=self.cycling_interval)
 
     def model_start_has_data(self, init_time: datetime.datetime) -> bool:
+        """Report whether the model start is likely to have data.
+
+        Parameters
+        ----------
+        init_time: datetime.datetime
+
+        Returns
+        -------
+        bool
+        """
         assert self.is_model_start(init_time)
         now = datetime.datetime.utcnow()
         return (now - init_time) > datetime.timedelta(hours=self.cycling_interval)
 
     def get_variable_name(self, variable: str) -> str:
+        """Get the name used by the model for the variable
+
+        Parameters
+        ----------
+        variable: str
+
+        Returns
+        -------
+        str
+        """
         return self.variable_mapping[variable]
 
     def get_model_data(
         self,
         init_time: datetime.datetime,
         valid_time: datetime.datetime,
-        variables: typing.List[str],
+        variables: typing.Iterable[str],
         pressure_mb: int,
         bbox_wesn: typing.Tuple[float, float, float, float],
     ) -> xarray.Dataset:
+        """Get the given data from the model.
+
+        Parameters
+        ----------
+        init_time: datetime.datetime
+        valid_time: datetime.datetime
+        variables: list of str
+        pressure_mb: int
+        bbox_wesn: tuple of float
+
+        Returns
+        -------
+        xarray.Dataset
+        """
         assert self.is_model_start(init_time)
         assert init_time <= valid_time
         level = int(self.convert_pressure_to_reported_units(pressure_mb))
         variable_mapping = self.variable_mapping
 
-        def get_variable_name(var_name: str) -> str:
+        def get_variable_name(var_name: str) -> typing.List[str]:
+            """Get the name(s) used by the model for the variable.
+
+            Will give variables used to derive that variable if needed.
+
+            Parameters
+            ----------
+            var_name: str
+
+            Returns
+            -------
+            list of str
+            """
             try:
                 result = [variable_mapping[var_name]]
             except KeyError:
@@ -160,7 +242,17 @@ class NwpModel:
         return dataset_cf
 
 
-def xarray_from_grib_data(grib_data):
+def xarray_from_grib_data(grib_data: bytes) -> xarray.Dataset:
+    """Produce an XArray dataset from binary grib data
+
+    Parameters
+    ----------
+    grib_data: bytes
+
+    Returns
+    -------
+    xarray.Dataset
+    """
     msg_id = eccodes.codes_new_from_message(grib_data)
     try:
         keys_iterator = eccodes.codes_keys_iterator_new(msg_id)
