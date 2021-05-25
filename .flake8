@@ -1,0 +1,14 @@
+# -*- mode: conf; -*-
+[flake8]
+exclude=
+    *_flymake.py,
+    build,
+    dist,
+    .tox,
+    dist,
+    .eggs,
+    .git,
+docstring-convention=numpy
+doctests=True
+max-complexity=10
+max-line-length=88

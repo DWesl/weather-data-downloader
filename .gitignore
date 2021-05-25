@@ -1,0 +1,13 @@
+*~
+
+# Python generated filed
+__pycache__
+/build/
+/dist/
+
+# Script-generated files
+ECMWF
+GFS
+NAM
+NAVGEM
+RAP
