@@ -5,4 +5,6 @@ flake8-bugbear
 flake8-docstrings
 flake8-rst-docstrings
 flake8-print
+pep8-naming
 mypy
+pylint
