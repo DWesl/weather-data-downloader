@@ -2,6 +2,7 @@ cmdline_provenance
 dataclasses; python_version < "3.7"
 importlib_metadata; python_version < "3.8"
 metpy
+netCDF4
 numpy
 python-dateutil
 siphon
