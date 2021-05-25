@@ -14,7 +14,6 @@ import typing
 import urllib.request
 from contextlib import closing
 
-import eccodes
 import numpy as np
 import xarray
 from metpy.constants import earth_avg_radius as EARTH_RADIUS
@@ -272,6 +271,8 @@ def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
     -------
     xarray.DataArray
     """
+    import eccodes
+
     msg_id = eccodes.codes_new_from_message(grib_data)
     try:
         keys_iterator = eccodes.codes_keys_iterator_new(msg_id)
