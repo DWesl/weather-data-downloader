@@ -44,3 +44,4 @@ jobs:
     - name: Test the pyz archive
       run: |
         python weather_data_downloader.pyz RAP 06
+        file RAP/*/*/*
