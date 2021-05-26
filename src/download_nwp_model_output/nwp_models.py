@@ -137,7 +137,7 @@ class NwpModel:
         """
         result: xarray.Dataset = self.data_access.get_model_data_pressure(
             init_time, valid_time, variables, pressure_mb, bbox_wesn
-        )
+        ).metpy.parse_cf()
         return result
 
     def get_model_data_height(
@@ -164,7 +164,7 @@ class NwpModel:
         """
         result: xarray.Dataset = self.data_access.get_model_data_height(
             init_time, valid_time, variables, height_m, bbox_wesn
-        )
+        ).metpy.parse_cf()
         return result
 
     def get_model_data_single_level(
@@ -189,7 +189,7 @@ class NwpModel:
         """
         result: xarray.Dataset = self.data_access.get_model_data_single_level(
             init_time, valid_time, variables, bbox_wesn
-        )
+        ).metpy.parse_cf()
         return result
 
 
@@ -245,10 +245,10 @@ FNMOC_VARIABLE_MAP: VariableMap = {
         "pressure": "wnd_vcmp_isobaric",
         "height": "wnd_vcmp_height_above_ground",
     },
-    "relative_humidity": {
-        "pressure": "rltv_hum_isobaric",
-        "height": "rltv_hum_height_above_ground",
-    },
+    # "relative_humidity": {
+    #     "pressure": "rltv_hum_isobaric",
+    #     "height": "rltv_hum_height_above_ground",
+    # },
     "air_pressure_at_mean_sea_level": "pres_reduced_msl",
     "low_type_cloud_area_fraction": "ttl_cld_cvr_low_cld",
     "medium_type_cloud_area_fraction": "ttl_cld_cvr_mid_cld",
