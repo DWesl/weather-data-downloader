@@ -1,0 +1,14 @@
+*.py text diff=python
+requirements*.txt text
+
+*.cfg text
+*.ini text
+*.toml text
+*.yaml text
+
+/.flake8 text
+
+*.rst text
+
+/MANIFEST.in text
+/VERSION text
