@@ -38,3 +38,9 @@ jobs:
         file GFS/*/*/*
         python -m download_nwp_model_output NAM 06
         file NAM/*/*/*
+    - name: Make a pyz archive
+      run: |
+        python -m zipapp --python="/usr/bin/env python3" --compress -o weather_data_downloader.pyz --main=download_nwp_model_output.__main__:main src/
+    - name: Test the pyz archive
+      run: |
+        python weather_data_downloader.pyz RAP 06
