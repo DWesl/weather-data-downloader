@@ -94,6 +94,7 @@ def test_ecmwf_pressure(forecast_hour: int) -> None:
     ----------
     forecast_hour: int
     """
+    pytest.importorskip("eccodes")
     model = NWP_MODELS["ECMWF"]
     init_time = model.get_model_start_with_data()
     valid_time = init_time + datetime.timedelta(hours=forecast_hour)
@@ -119,6 +120,7 @@ def test_ecmwf_surface(forecast_hour: int) -> None:
     ----------
     forecast_hour: int
     """
+    pytest.importorskip("eccodes")
     model = NWP_MODELS["ECMWF"]
     init_time = model.get_model_start_with_data()
     valid_time = init_time + datetime.timedelta(hours=forecast_hour)
