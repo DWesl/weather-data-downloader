@@ -232,7 +232,7 @@ def get_output_log() -> str:
     history: str
         A history attribute to use in an output file
     """
-    result: str = cmdline_provenance.new_log(
+    result: str = cmdline_provenance.new_log(  # pylint: disable=unexpected-keyword-arg
         infile_history=INPUT_LOGS, git_repo=REPO_ROOT
     )
     return result

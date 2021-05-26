@@ -16,9 +16,11 @@ import typing
 import dateutil.parser
 
 from .conventions_utilities import RUN_DATE, save_nonsparse_netcdf
-from .nwp_models import N_AMER_BBOX, NCEP_VARIABLE_MAP, NWP_MODELS
+from .data_source import PRESSURE_VARIABLES
+from .nwp_models import NWP_MODELS, BboxWesn
 
 RUN_DIR = os.path.abspath(".")
+N_AMER_BBOX = BboxWesn(-180, 10, 0, 90)
 
 ############################################################
 # Program logic
@@ -54,14 +56,16 @@ def main_argv(argv: typing.List[str]) -> int:
             RUN_DIR, model.abbrev, last_start.isoformat(), valid_time.isoformat()
         )
     )
+    variables: typing.Iterable[str]
     save_dir.mkdir(parents=True, exist_ok=True)
 
     if model.abbrev != "ECMWF":
+        variables = PRESSURE_VARIABLES & model.data_access.variable_mapping.keys()
         for pressure_mb in (1000, 925, 850, 700, 500, 300, 200):
-            dataset = model.get_model_data(
+            dataset = model.get_model_data_pressure(
                 last_start,
                 valid_time,
-                NCEP_VARIABLE_MAP.keys(),
+                variables,
                 pressure_mb,
                 N_AMER_BBOX,
             )
@@ -82,7 +86,7 @@ def main_argv(argv: typing.List[str]) -> int:
             (850, ["x_wind", "y_wind", "air_temperature"]),
             (500, ["geopotential_height"]),
         ):
-            dataset = model.get_model_data(
+            dataset = model.get_model_data_pressure(
                 last_start, valid_time, variables, pressure_mb, N_AMER_BBOX
             )
             del dataset.coords["metpy_crs"]
