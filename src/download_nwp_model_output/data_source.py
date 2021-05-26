@@ -30,7 +30,7 @@ METPY_DEPENDENT_VARIABLES = {
 PRESSURE_VARIABLES = frozenset(
     ["air_temperature", "geopotential_height", "x_wind", "y_wind", "relative_humidity"]
 )
-HEIGHT_2M_VARIABLES = frozenset(["air_temperature", "relative_humidity"])
+HEIGHT_2M_VARIABLES = frozenset(["air_temperature", "dew_point_temperature"])
 HEIGHT_10M_VARIABLES = frozenset(["x_wind", "y_wind"])
 SINGLE_LEVEL_VARIABLES = frozenset(
     [

@@ -265,7 +265,7 @@ NWP_MODELS = dict(
         "NCEP",
         TDSDataSource(
             "Pa",
-            NCEP_VARIABLE_MAP,
+            NCEP_VARIABLE_MAP.copy(),
             (
                 "https://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/"
                 "Global_0p5deg/catalog.xml"
@@ -282,7 +282,7 @@ NWP_MODELS = dict(
         "NCEP",
         TDSDataSource(
             "Pa",
-            NCEP_VARIABLE_MAP,
+            NCEP_VARIABLE_MAP.copy(),
             (
                 "https://thredds.ucar.edu/thredds/catalog/grib/NCEP/NAM/CONUS_40km/"
                 "conduit/catalog.xml"
@@ -298,7 +298,7 @@ NWP_MODELS = dict(
         "NCEP",
         TDSDataSource(
             "Pa",
-            NCEP_VARIABLE_MAP,
+            NCEP_VARIABLE_MAP.copy(),
             (
                 "https://thredds.ucar.edu/thredds/catalog/grib/"
                 "NCEP/RAP/CONUS_40km/catalog.xml"
@@ -349,4 +349,10 @@ NWP_MODELS = dict(
         ),
         availability_delay=18,
     ),
+)
+NWP_MODELS["RAP"].data_access.variable_mapping[
+    "air_pressure_at_mean_sea_level"
+] = "MSLP_MAPS_System_Reduction_msl"
+NWP_MODELS["NAM"].data_access.variable_mapping.update(
+    {"cloud_area_fraction": "Total_cloud_cover_entire_atmosphere_single_layer"}
 )
