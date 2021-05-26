@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# ~*~ coding: utf8 ~*~
+# -*- coding: utf-8 -*-
 """Script to download and save data for given model and time.
 
 Each level currently saved in a different file to avoid a half-empty

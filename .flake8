@@ -12,3 +12,16 @@ docstring-convention=numpy
 doctests=True
 max-complexity=10
 max-line-length=88
+rst-roles=
+    # Sphinx
+    abbr
+    # My extlinks
+    pypi
+extend_ignore=
+    # conflicts with numpydoc
+    RST201
+    RST301
+
+[pydocstyle]
+convention=numpy
+add_ignore=D413

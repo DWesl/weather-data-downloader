@@ -1,5 +1,5 @@
-# ~*~ coding: utf8 ~*~
-"""Utility functions for convention compliance
+# -*- coding: utf-8 -*-
+"""Utility functions for convention compliance.
 
 Built around the Climate and Forecast (CF) and Attribute Conventions
 for Data Discovert (ACDD) conventions.  Implementation taken from

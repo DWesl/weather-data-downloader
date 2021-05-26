@@ -1,0 +1,44 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: fix-encoding-pragma
+    -   id: check-merge-conflict
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.8.0
+    hooks:
+      - id: isort
+- repo: https://github.com/psf/black
+  rev: 21.5b1
+  hooks:
+    - id: black
+- repo: https://github.com/PyCQA/flake8
+  rev: 3.9.2
+  hooks:
+    - id: flake8
+      additional_dependencies: ['flake8-docstrings', 'flake8-rst-docstrings', 'pep8-naming', 'flake8-print']
+- repo: https://github.com/PyCQA/pydocstyle
+  rev: 6.1.1
+  hooks:
+    - id: pydocstyle
+      additional_dependencies: ['toml']
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v0.812
+  hooks:
+    - id: mypy
+- repo: https://github.com/PyCQA/pylint
+  rev: v2.8.2
+  hooks:
+    - id: pylint
+      additional_dependencies: ['python-dateutil']
+      args: ['--disable=E0401,import-error', '--allow-any-import-level=eccodes']
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v1.17.0
+    hooks:
+    -   id: setup-cfg-fmt

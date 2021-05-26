@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Download specified NWP model data.
 
 A quick conversion of my images-on-demand python/django code to just
@@ -14,7 +15,7 @@ download the variables I used to make plots in my server.
 try:
     from importlib.metadata import version  # type: ignore
 except ImportError:
-    from importlib_metadata import version  # type: ignore
+    from importlib_metadata import version
 
 from .nwp_models import NWP_MODELS
 

@@ -1,4 +1,4 @@
-# ~*~ coding: utf8 ~*~
+# -*- coding: utf-8 -*-
 """Collect the data and algorithms needed to get model data.
 
 One general-ish class (general for models available through TDS, less
@@ -16,7 +16,7 @@ from contextlib import closing
 
 import numpy as np
 import xarray
-from metpy.constants import earth_avg_radius as EARTH_RADIUS
+from metpy.constants import earth_avg_radius as EARTH_RADIUS  # noqa: N812
 from metpy.units import units
 from siphon.catalog import TDSCatalog
 
@@ -40,6 +40,8 @@ class NwpModel:
     dump it into metadata.  :pypi:`cc-plugin-ncei` would install a
     good checker.
     """
+
+    # pylint: disable=too-many-instance-attributes
 
     abbrev: str
     short_desc: str
@@ -69,7 +71,7 @@ class NwpModel:
         return int(units(f"{pressure:d} hPa").to(self.pressure_level_units).magnitude)
 
     def is_model_start(self, init_time: datetime.datetime) -> bool:
-        """Is there a model run starting at the given time?
+        """Check if there is a model run starting at the given time.
 
         Parameters
         ----------
@@ -127,7 +129,7 @@ class NwpModel:
         return (now - init_time) > datetime.timedelta(hours=self.cycling_interval)
 
     def get_variable_name(self, variable: str) -> str:
-        """Get the name used by the model for the variable
+        """Get the name used by the model for the variable.
 
         Parameters
         ----------
@@ -139,7 +141,7 @@ class NwpModel:
         """
         return self.variable_mapping[variable]
 
-    def get_model_data(
+    def get_model_data(  # pylint: disable=too-many-arguments,too-many-locals
         self,
         init_time: datetime.datetime,
         valid_time: datetime.datetime,
@@ -260,8 +262,10 @@ class NwpModel:
         return dataset_cf
 
 
-def xarray_from_grib_data(grib_data: bytes) -> xarray.DataArray:
-    """Produce an XArray dataset from binary grib data
+def xarray_from_grib_data(  # pylint: disable=too-many-locals
+    grib_data: bytes,
+) -> xarray.DataArray:
+    """Produce an XArray dataset from binary grib data.
 
     Parameters
     ----------
