@@ -35,6 +35,7 @@ HEIGHT_10M_VARIABLES = frozenset(["x_wind", "y_wind"])
 SINGLE_LEVEL_VARIABLES = frozenset(
     [
         "air_pressure_at_mean_sea_level",
+        "surface_air_pressure",
         "low_type_cloud_area_fraction",
         "medium_type_cloud_area_fraction",
         "high_type_cloud_area_fraction",

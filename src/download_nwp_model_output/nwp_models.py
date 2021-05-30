@@ -217,6 +217,7 @@ NCEP_VARIABLE_MAP: VariableMap = {
         "Precipitable_water_entire_atmosphere_single_layer"
     ),
     "air_pressure_at_mean_sea_level": "Pressure_reduced_to_MSL_msl",
+    "surface_air_pressure": "Pressure_surface",
     "high_type_cloud_area_fraction": "High_cloud_cover_high_cloud",
     "medium_type_cloud_area_fraction": "Medium_cloud_cover_middle_cloud",
     "low_type_cloud_area_fraction": "Low_cloud_cover_low_cloud",
