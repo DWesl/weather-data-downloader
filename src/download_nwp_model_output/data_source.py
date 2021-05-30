@@ -587,7 +587,7 @@ class EcmwfFtpDataSource(NwpDataSource):
         return dataset
 
 
-def xarray_from_grib_data(  # pylint: disable=too-many-locals
+def xarray_from_grib_data(  # pylint: disable=too-many-locals,too-many-branches
     grib_data: bytes,
 ) -> xarray.DataArray:
     """Produce an XArray dataset from binary grib data.
@@ -620,10 +620,10 @@ def xarray_from_grib_data(  # pylint: disable=too-many-locals
     num_rows = grib_attributes.pop("Nj")
     num_cols = grib_attributes.pop("Ni")
     field_values = grib_attributes.pop("values").reshape(num_rows, num_cols)
+    # Not sure what to do with these.
+    del grib_attributes["codedValues"]
     latitudes = grib_attributes.pop("latitudes").reshape(num_rows, num_cols)
     longitudes = grib_attributes.pop("longitudes").reshape(num_rows, num_cols)
-    # latitude = grib_attributes.pop("distinctLatitudes")
-    # longitude = grib_attributes.pop("distinctLongtitudes")
     del grib_attributes["latLonValues"]
     forecast_reference_time = datetime.datetime(
         grib_attributes.pop("year"),
@@ -655,78 +655,88 @@ def xarray_from_grib_data(  # pylint: disable=too-many-locals
     field_min = grib_attributes.pop("minimum")
     field_max = grib_attributes.pop("maximum")
     missing_value = grib_attributes.pop("missingValue")
-    # earth_radius = grib_attributes.pop("earthRadius")
 
-    result: xarray.DataArray = (
-        xarray.DataArray(
-            field_values,
-            {
-                # "latitude": (
-                #     ("latitude",),
-                #     latitude,
-                #     {
-                #         "standard_name": "latitude",
-                #         "units": "degrees_north",
-                #     },
-                # ),
-                # "longitude": (
-                #     ("longitude",),
-                #     longitude,
-                #     {
-                #         "standard_name": "longitude",
-                #         "units": "degrees_east",
-                #     },
-                # ),
-                "latitudes": (
-                    ("latitude", "longitude"),
-                    latitudes,
-                    {
-                        "standard_name": "latitude",
-                        "units": "degrees_north",
-                    },
-                ),
-                "longitudes": (
-                    ("latitude", "longitude"),
-                    longitudes,
-                    {
-                        "standard_name": "longitude",
-                        "units": "degrees_east",
-                    },
-                ),
-                "forecast_reference_time": (
-                    (),
-                    forecast_reference_time,
-                    {"standard_name": "forecast_reference_time"},
-                ),
-                "forecast_period": (
-                    (),
-                    forecast_period,
-                    {"standard_name": "forecast_period"},
-                ),
-                "valid_time": (
-                    (),
-                    forecast_reference_time + forecast_period,
-                    {"standard_name": "time"},
-                ),
-                "level": level,
-            },
-            ("latitude", "longitude"),
-            standard_name,
-            {
-                "standard_name": standard_name,
-                "units": grib_units,
-                "actual_range": (field_min, field_max),
-            },
-            {"_FillValue": missing_value, "grid_mapping_name": "latlon_crs"},
-        )
-        .metpy.assign_crs(
-            grid_mapping_name="latitude_longitude",
-            # earth_radius=earth_radius,
-            earth_radius=EARTH_RADIUS.magnitude,
-        )
-        .load()
+    result: xarray.DataArray = xarray.DataArray(
+        field_values,
+        {
+            "latitudes": (
+                ("latitude", "longitude"),
+                latitudes,
+                {
+                    "standard_name": "latitude",
+                    "units": "degrees_north",
+                },
+            ),
+            "longitudes": (
+                ("latitude", "longitude"),
+                longitudes,
+                {
+                    "standard_name": "longitude",
+                    "units": "degrees_east",
+                },
+            ),
+            "forecast_reference_time": (
+                (),
+                forecast_reference_time,
+                {"standard_name": "forecast_reference_time"},
+            ),
+            "forecast_period": (
+                (),
+                forecast_period,
+                {"standard_name": "forecast_period"},
+            ),
+            "valid_time": (
+                (),
+                forecast_reference_time + forecast_period,
+                {"standard_name": "time"},
+            ),
+            "level": level,
+        },
+        ("latitude", "longitude"),
+        standard_name,
+        {
+            "standard_name": standard_name,
+            "units": grib_units,
+            "actual_range": (field_min, field_max),
+        },
+        {"_FillValue": missing_value, "grid_mapping_name": "latlon_crs"},
+    ).load()
+    if "earthRadius" in grib_attributes and np.isfinite(grib_attributes["earthRadius"]):
+        earth_radius = grib_attributes.pop("earthRadius")
+    else:
+        earth_radius = EARTH_RADIUS.magnitude
+    result = result.metpy.assign_crs(
+        grid_mapping_name="latitude_longitude", earth_radius=earth_radius
     )
+    if "name" in grib_attributes:
+        result.attrs["long_name"] = grib_attributes.pop("name")
     result.coords["latlon_crs"] = ((), -1, result.metpy.pyproj_crs.to_cf())
+    try:
+        latitude = grib_attributes.pop("distinctLatitudes")
+        longitude = grib_attributes.pop("distinctLongitudes")
+        if all(np.isfinite(latitude)) and all(np.isfinite(longitude)):
+            result.coords.update(
+                {
+                    "latitude": (
+                        ("latitude",),
+                        latitude,
+                        {
+                            "standard_name": "latitude",
+                            "units": "degrees_north",
+                        },
+                    ),
+                    "longitude": (
+                        ("longitude",),
+                        longitude,
+                        {
+                            "standard_name": "longitude",
+                            "units": "degrees_east",
+                        },
+                    ),
+                }
+            )
+    except KeyError:
+        pass
     result.attrs.update(
         {
             f"GRIB_{name:s}": value

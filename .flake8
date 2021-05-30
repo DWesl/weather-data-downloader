@@ -10,7 +10,7 @@ exclude=
     .git,
 docstring-convention=numpy
 doctests=True
-max-complexity=10
+max-complexity=11
 max-line-length=88
 rst-roles=
     # Sphinx

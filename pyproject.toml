@@ -17,3 +17,4 @@ allow-any-import-level = ["eccodes"]
 [tool.pylint.design]
 max-args = 6
 max-locals = 20
+max-statements = 55
