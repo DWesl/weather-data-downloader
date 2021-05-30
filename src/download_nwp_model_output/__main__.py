@@ -44,9 +44,7 @@ def main_argv(argv: typing.List[str]) -> int:
     args = PARSER.parse_args(argv)
     model = NWP_MODELS[args.model_abbrev]
     if args.init_time is None:
-        last_start = model.get_last_model_start()
-        if not model.model_start_has_data(last_start):
-            last_start = model.get_previous_model_start(last_start)
+        last_start = model.get_model_start_with_data()
     else:
         last_start = args.init_time
         assert last_start < RUN_DATE
