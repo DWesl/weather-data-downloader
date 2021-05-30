@@ -16,7 +16,7 @@ import typing
 import dateutil.parser
 
 from .conventions_utilities import RUN_DATE, save_nonsparse_netcdf
-from .data_source import PRESSURE_VARIABLES
+from .data_source import PRESSURE_VARIABLES, SINGLE_LEVEL_VARIABLES
 from .nwp_models import NWP_MODELS, BboxWesn
 
 RUN_DIR = os.path.abspath(".")
@@ -80,6 +80,21 @@ def main_argv(argv: typing.List[str]) -> int:
                     ),
                 ),
             )
+        variables = SINGLE_LEVEL_VARIABLES & model.data_access.variable_mapping.keys()
+        dataset = model.get_model_data_single_level(
+            last_start, valid_time, variables, N_AMER_BBOX
+        )
+        del dataset.coords["metpy_crs"]
+        save_nonsparse_netcdf(
+            dataset,
+            os.path.join(
+                save_dir,
+                (
+                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                    f"f{args.forecast_hour:02d}_single_level_data.nc4"
+                ),
+            ),
+        )
     else:
         # ECMWF
         for pressure_mb, variables in (
@@ -100,6 +115,21 @@ def main_argv(argv: typing.List[str]) -> int:
                     ),
                 ),
             )
+        variables = SINGLE_LEVEL_VARIABLES & model.data_access.variable_mapping.keys()
+        dataset = model.get_model_data_single_level(
+            last_start, valid_time, variables, N_AMER_BBOX
+        )
+        del dataset.coords["metpy_crs"]
+        save_nonsparse_netcdf(
+            dataset,
+            os.path.join(
+                save_dir,
+                (
+                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                    f"f{args.forecast_hour:02d}_single_level_data.nc4"
+                ),
+            ),
+        )
     return 0
 
 
