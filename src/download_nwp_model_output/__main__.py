@@ -16,9 +16,11 @@ import typing
 import dateutil.parser
 
 from .conventions_utilities import RUN_DATE, save_nonsparse_netcdf
-from .nwp_models import N_AMER_BBOX, NCEP_VARIABLE_MAP, NWP_MODELS
+from .data_source import PRESSURE_VARIABLES, SINGLE_LEVEL_VARIABLES
+from .nwp_models import NWP_MODELS, BboxWesn
 
 RUN_DIR = os.path.abspath(".")
+N_AMER_BBOX = BboxWesn(-180, 10, 0, 90)
 
 ############################################################
 # Program logic
@@ -42,9 +44,7 @@ def main_argv(argv: typing.List[str]) -> int:
     args = PARSER.parse_args(argv)
     model = NWP_MODELS[args.model_abbrev]
     if args.init_time is None:
-        last_start = model.get_last_model_start()
-        if not model.model_start_has_data(last_start):
-            last_start = model.get_previous_model_start(last_start)
+        last_start = model.get_model_start_with_data()
     else:
         last_start = args.init_time
         assert last_start < RUN_DATE
@@ -54,14 +54,16 @@ def main_argv(argv: typing.List[str]) -> int:
             RUN_DIR, model.abbrev, last_start.isoformat(), valid_time.isoformat()
         )
     )
+    variables: typing.Iterable[str]
     save_dir.mkdir(parents=True, exist_ok=True)
 
     if model.abbrev != "ECMWF":
+        variables = PRESSURE_VARIABLES & model.data_access.variable_mapping.keys()
         for pressure_mb in (1000, 925, 850, 700, 500, 300, 200):
-            dataset = model.get_model_data(
+            dataset = model.get_model_data_pressure(
                 last_start,
                 valid_time,
-                NCEP_VARIABLE_MAP.keys(),
+                variables,
                 pressure_mb,
                 N_AMER_BBOX,
             )
@@ -76,13 +78,28 @@ def main_argv(argv: typing.List[str]) -> int:
                     ),
                 ),
             )
+        variables = SINGLE_LEVEL_VARIABLES & model.data_access.variable_mapping.keys()
+        dataset = model.get_model_data_single_level(
+            last_start, valid_time, variables, N_AMER_BBOX
+        )
+        del dataset.coords["metpy_crs"]
+        save_nonsparse_netcdf(
+            dataset,
+            os.path.join(
+                save_dir,
+                (
+                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                    f"f{args.forecast_hour:02d}_single_level_data.nc4"
+                ),
+            ),
+        )
     else:
         # ECMWF
         for pressure_mb, variables in (
             (850, ["x_wind", "y_wind", "air_temperature"]),
             (500, ["geopotential_height"]),
         ):
-            dataset = model.get_model_data(
+            dataset = model.get_model_data_pressure(
                 last_start, valid_time, variables, pressure_mb, N_AMER_BBOX
             )
             del dataset.coords["metpy_crs"]
@@ -96,6 +113,21 @@ def main_argv(argv: typing.List[str]) -> int:
                     ),
                 ),
             )
+        variables = SINGLE_LEVEL_VARIABLES & model.data_access.variable_mapping.keys()
+        dataset = model.get_model_data_single_level(
+            last_start, valid_time, variables, N_AMER_BBOX
+        )
+        del dataset.coords["metpy_crs"]
+        save_nonsparse_netcdf(
+            dataset,
+            os.path.join(
+                save_dir,
+                (
+                    f"{model.abbrev}_{last_start:%Y%m%dT%H}_"
+                    f"f{args.forecast_hour:02d}_single_level_data.nc4"
+                ),
+            ),
+        )
     return 0
 
 

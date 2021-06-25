@@ -1,3 +1,20 @@
 [build-system]
 requires = ["setuptools>=30.3.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["src", "tests"]
+
+[tool.pylint.similarities]
+ignorepdocstrings = "y"
+min-similarity-lines = 8
+
+[tool.pylint.imports]
+allow-any-import-level = ["eccodes"]
+
+[tool.pylint.design]
+max-args = 6
+max-locals = 20
+max-statements = 55
